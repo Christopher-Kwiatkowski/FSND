@@ -258,7 +258,10 @@ def create_venue_form():
 def create_venue_submission():
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
-
+    artist_id = request.get_json()['artist_id']
+    venue_id = request.get_json()['venue_id']
+    start_time = request.get_json()['start_time']
+    print(f"A {artist_id} + V {venue_id} + ST {start_time}")
     # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
     # TODO: on unsuccessful db insert, flash an error instead.
@@ -461,6 +464,16 @@ def create_artist_submission():
     # called upon submitting the new artist listing form
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
+    name = request.form['name']
+    city = request.form['city']
+    state = request.form['state']
+    phone = request.form['phone']
+    image_link = request.form['image_link']
+    genres = request.form.getlist('genres')
+    facebook_link = request.form['facebook_link']
+    seeking_venue = request.form['seeking_venue']
+    seeking_description = request.form['seeking_description']
+    print(f"N {name} + C {city} + S {state} + P {phone} + IL {image_link} + G {genres} + FL {facebook_link} + SV {seeking_venue} + SD {seeking_description}")
 
     # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
@@ -527,7 +540,11 @@ def create_shows():
 def create_show_submission():
     # called to create new shows in the db, upon submitting new show listing form
     # TODO: insert form data as a new Show record in the db, instead
-
+    artist_id = request.get_json()['artist_id']
+    venue_id = request.get_json()['venue_id']
+    start_time = request.get_json()['start_time']
+    # print(f"A {artist_id} + V {venue_id} + ST {start_time}")
+    flash('Why am I not working?')
     # on successful db insert, flash success
     flash('Show was successfully listed!')
     # TODO: on unsuccessful db insert, flash an error instead.
