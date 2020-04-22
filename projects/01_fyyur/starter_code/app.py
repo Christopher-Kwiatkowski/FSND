@@ -617,6 +617,13 @@ def create_shows():
 def create_show_submission():
     # called to create new shows in the db, upon submitting new show listing form
     # TODO: insert form data as a new Show record in the db, instead
+    new_show_date = 0
+    current_date = format_datetime(babel.dates.format_datetime(format='short',
+                                                               tzinfo=babel.dates.get_timezone('America/Denver')))
+    current_day = current_date[8:10]
+    current_month = current_date[4:6]
+    current_year = current_date[14:16]
+    current_date_total = current_year+current_month+current_day
     try:
         artist_id = request.form['artist_id']
         venue_id = request.form['venue_id']
@@ -625,23 +632,33 @@ def create_show_submission():
         month = start_time[5:7]
         day = start_time[8:10]
         new_show_date = year+month+day
-        current_date = format_datetime(babel.dates.format_datetime(format='short',
-                                                                   tzinfo=babel.dates.get_timezone('America/Denver')))
-        current_day = current_date[8:10]
-        current_month = current_date[4:6]
-        current_year = current_date[14:16]
-        current_date_total = current_year+current_month+current_day
+
+    # on successful db insert, flash success
+        show = Show(venue_id=venue_id, artist_id=artist_id,
+                    start_time=start_time)
+        db.session.add(show)
+        db.session.commit()
+        # on successful db insert, flash success
         # if date is in the future or today, add show to future shows, else add to past shows
         if new_show_date >= current_date_total:
-            print('>=')
+            venue_upcoming_shows = Venue.query.get(venue_id)
+            artist_upcoming_shows = Artist.query.get(artist_id)
+            venue_upcoming_shows.upcoming_shows.append(show.id)
+            artist_upcoming_shows.upcoming_shows.append(
+                show.id)
+            venue_upcoming_shows.upcoming_shows_count += 1
+            artist_upcoming_shows.upcoming_shows_count += 1
+            db.session.commit()
         else:
-            print('<')
-    # on successful db insert, flash success
-        # show = Show(venue_id=venue_id, artist_id=artist_id, start_time=start_time)
-        # db.session.add(show)
-        # db.session.commit()
-        # on successful db insert, flash success
-
+            venue_past_shows = Venue.query.get(venue_id)
+            artist_past_shows = Artist.query.get(artist_id)
+            venue_past_shows.past_shows.append(
+                show.id)
+            artist_past_shows.past_shows.append(
+                show.id)
+            venue_past_shows.past_shows_count += 1
+            artist_past_shows.past_shows_count += 1
+            db.session.commit()
         flash('Show was successfully listed!')
     except Exception as error:
         print("Oops! An exception has occured:", error)
@@ -649,8 +666,8 @@ def create_show_submission():
         error = True
         # db.session.rollback()
         flash('An error occurred. Show could not be listed.')
-    # finally:
-    #     db.session.close()
+    finally:
+        db.session.close()
 
     # TODO: on unsuccessful db insert, flash an error instead.
     # e.g., flash('An error occurred. Show could not be listed.')
