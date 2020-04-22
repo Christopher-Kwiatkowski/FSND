@@ -1,7 +1,7 @@
 {% extends 'layouts/main.html' %} {% block title %}New Show Listing{% endblock
 %} {% block content %}
 <div class="form-wrapper">
-  <form method="post" class="form" id="new_show">
+  <form method="POST" class="form" action="/shows/create">
     <h3 class="form-heading">List a new show</h3>
     <div class="form-group">
       <label for="artist_id">Artist ID</label>
@@ -24,21 +24,5 @@
       class="btn btn-primary btn-lg btn-block"
     />
   </form>
-  <script>
-    document.getElementById("new_show").onsubmit = function (e) {
-      e.preventDefault();
-      fetch("/shows/create", {
-        method: "POST",
-        body: JSON.stringify({
-          artist_id: document.getElementById("artist_id").value,
-          venue_id: document.getElementById("venue_id").value,
-          start_time: document.getElementById("start_time").value,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    };
-  </script>
 </div>
 {% endblock %}
