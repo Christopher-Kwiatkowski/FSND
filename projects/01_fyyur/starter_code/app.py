@@ -643,7 +643,11 @@ def create_show_submission():
         if new_show_date >= current_date_total:
             venue_upcoming_shows = Venue.query.get(venue_id)
             artist_upcoming_shows = Artist.query.get(artist_id)
+            venue_upcoming_shows.upcoming_shows = list(
+                venue_upcoming_shows.upcoming_shows)
             venue_upcoming_shows.upcoming_shows.append(show.id)
+            artist_upcoming_shows.upcoming_shows = list(
+                artist_upcoming_shows.upcoming_shows)
             artist_upcoming_shows.upcoming_shows.append(
                 show.id)
             venue_upcoming_shows.upcoming_shows_count += 1
@@ -652,8 +656,10 @@ def create_show_submission():
         else:
             venue_past_shows = Venue.query.get(venue_id)
             artist_past_shows = Artist.query.get(artist_id)
+            venue_past_shows.past_shows = list(venue_past_shows.past_shows)
             venue_past_shows.past_shows.append(
                 show.id)
+            artist_past_shows.past_shows = list(artist_past_shows.past_shows)
             artist_past_shows.past_shows.append(
                 show.id)
             venue_past_shows.past_shows_count += 1
@@ -668,7 +674,6 @@ def create_show_submission():
         flash('An error occurred. Show could not be listed.')
     finally:
         db.session.close()
-
     # TODO: on unsuccessful db insert, flash an error instead.
     # e.g., flash('An error occurred. Show could not be listed.')
     # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
