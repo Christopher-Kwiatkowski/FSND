@@ -188,11 +188,65 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not. 
     '''
-
+    @app.route('/quizzes', methods=["POST"])
+    def quiz():
+        search_term = json.loads(request.data)
+        previous_questions = search_term['previous_questions']
+        quiz_category = int(search_term['quiz_category']['id'])
+        print(previous_questions)
+        print(quiz_category)
+        if quiz_category == 0:
+            questions = Question.query.all()
+        else:
+            questions = Question.query.filter_by(category=quiz_category).all()
+        data = []
+        for question in questions:
+            if not question.id in previous_questions:
+                data.append(question.format())
+        if not data:
+            question = False
+        else:
+            rand = random.randint(0, len(data)-1)
+            question = data[rand]
+        return jsonify({
+            'success': True,
+            'question': question,
+        })
     '''
     @TODO: 
     Create error handlers for all expected errors 
     including 404 and 422. 
     '''
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": "Bad request"
+        }), 400
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "Not found"
+        }), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "Unprocessable entity"
+        }), 422
+
+    @app.errorhandler(500)
+    def server(error):
+        return jsonify({
+            "success": False,
+            "error": 500,
+            "message": "Server error"
+        }), 500
 
     return app
